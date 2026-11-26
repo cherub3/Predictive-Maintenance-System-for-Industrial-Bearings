@@ -1,0 +1,466 @@
+project:
+  name: "Bearing Remaining Useful Life Prediction & Maintenance Decision System"
+  version: "0.1.0"
+  target_company: "industrial bearing fleet"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_dir: "logs"
+  log_file: "pipeline.log"
+  max_bytes: 10485760 # 10MB
+  backup_count: 5
+
+paths:
+  data_dir: "data"
+  raw_data_dir: "data/raw"
+  processed_data_dir: "data/processed"
+  external_data_dir: "data/external"
+  output_dir: "outputs"
+  report_dir: "reports"
+
+# ---------------------------------------------------------------------------
+# DATASETS REGISTRY — multi-experiment support (NASA IMS Set 1/2/3)
+#
+# Single source of truth for which bearings exist in each dataset, which are
+# run-to-failure (rtf) vs. censored, and how many accelerometer channels each
+# bearing carries. Set 1 has 2 channels/bearing (X/Y axes); Set 2 and Set 3
+# have 1 channel/bearing (single axis) — this difference is why
+# `channel_layout` and `expected_channels_per_file` exist per dataset rather
+# than as the old flat `signal_analysis.num_channels: 8`.
+#
+# Consumers must go through the helper functions in src/config.py
+# (get_rtf_units, get_censored_units, get_dataset_for_unit,
+# get_channel_bearing_map) rather than reading this structure directly, so
+# there is exactly one place that understands its shape.
+#
+# Migration note: the legacy flat keys (signal_analysis.num_channels,
+# rul_target.rtf_units, rul_target.censored_units, rul_target.run_window)
+# are retained below for Set-1-only modules that have not yet been migrated
+# to read from this registry. They are being phased out module-by-module
+# (see ENGINEERING_DECISIONS.md) and must not be treated as authoritative
+# once a module has been migrated.
+# ---------------------------------------------------------------------------
+datasets:
+  registry_version: "1.0"
+
+  defaults:
+    sampling_rate_hz: 20000
+    samples_per_file: 20480
+    shaft_speed_rpm: 2000.0
+    bearing_geometry:
+      num_rolling_elements: 16
+      ball_diameter_inches: 0.331
+      pitch_diameter_inches: 2.815
+      contact_angle_degrees: 15.17
+
+  sets:
+    set1:
+      display_name: "NASA IMS Set 1"
+      raw_dir: "data/raw/set1"
+      run_window: {start: "2003-10-22", end: "2003-11-25"}
+      channel_layout: paired_xy
+      expected_channels_per_file: 8
+      bearings:
+        bearing_1: {channels: [1, 2], channel_axes: {1: X, 2: Y}, status: censored}
+        bearing_2: {channels: [3, 4], channel_axes: {3: X, 4: Y}, status: censored}
+        bearing_3: {channels: [5, 6], channel_axes: {5: X, 6: Y}, status: rtf, failure_mode: inner_race}
+        bearing_4: {channels: [7, 8], channel_axes: {7: X, 8: Y}, status: rtf, failure_mode: rolling_element}
+
+    set2:
+      display_name: "NASA IMS Set 2"
+      raw_dir: "data/raw/set2"
+      run_window: {start: "2004-02-12", end: "2004-02-19"}
+      channel_layout: single_axis
+      expected_channels_per_file: 4
+      bearings:
+        bearing_1: {channels: [1], channel_axes: {1: X}, status: rtf, failure_mode: outer_race}
+        bearing_2: {channels: [2], channel_axes: {2: X}, status: censored}
+        bearing_3: {channels: [3], channel_axes: {3: X}, status: censored}
+        bearing_4: {channels: [4], channel_axes: {4: X}, status: censored}
+
+    set3:
+      display_name: "NASA IMS Set 3"
+      raw_dir: "data/raw/set3"
+      # end date corrected from the bundled README's stated "2004-04-04" to the
+      # actual last valid signal file's date. See ENGINEERING_DECISIONS.md ED-005:
+      # RMS/kurtosis evidence shows the true bearing_3 outer-race failure ramp
+      # (RMS 0.07 -> 0.76, kurtosis up to 16+) continues through 2004-04-18, with
+      # the final file (2004.04.18.02.42.55) reading near-zero signal (DAQ/rig
+      # shutdown immediately after failure, excluded as the failure timestamp).
+      run_window: {start: "2004-03-04", end: "2004-04-18"}
+      last_valid_file_timestamp: "2004.04.18.02.32.55"
+      excluded_files: ["2004.04.18.02.42.55"]  # post-shutdown dead signal, not part of the run
+      channel_layout: single_axis
+      expected_channels_per_file: 4
+      bearings:
+        bearing_1: {channels: [1], channel_axes: {1: X}, status: censored}
+        bearing_2: {channels: [2], channel_axes: {2: X}, status: censored}
+        bearing_3: {channels: [3], channel_axes: {3: X}, status: rtf, failure_mode: outer_race}
+        bearing_4: {channels: [4], channel_axes: {4: X}, status: censored}
+
+signal_analysis:
+  sampling_rate_hz: 20000
+  samples_per_file: 20480
+  num_channels: 8
+  shaft_speed_rpm: 2000.0
+
+  bearing_geometry:
+    num_rolling_elements: 16
+    ball_diameter_inches: 0.331
+    pitch_diameter_inches: 2.815
+    contact_angle_degrees: 15.17
+
+  checkpoint_selection:
+    n_checkpoints: 20
+    early_fraction: 0.05
+    late_fraction: 0.10
+
+  gate_thresholds:
+    skewness_abs_mean_threshold: 0.5
+    xy_asymmetry_cv_threshold: 0.15
+    rolling_variance_correlation_threshold: 0.8
+    rolling_variance_window_files: 10
+
+  output_paths:
+    health_indicators: "data/processed/signal_health_indicators.parquet"
+    checkpoint_selection: "data/processed/checkpoint_selection.csv"
+    engineering_findings: "reports/engineering_findings.md"
+    signal_analysis_report: "reports/signal_analysis_report.md"
+    gating_contract: "reports/phase3_gating_decisions.yaml"
+    figures_dir: "reports/figures"
+
+rul_target:
+  # Unit classification — config-declared, human-verifiable against Phase 3 findings
+  rtf_units:
+    - bearing_3  # Inner-race defect (documented failure)
+    - bearing_4  # Rolling-element defect (documented failure)
+  censored_units:
+    - bearing_1  # Survivor — right-censored; no failure event observed
+    - bearing_2  # Survivor — right-censored; no failure event observed
+
+  # Label configuration
+  rul_primary_unit: minutes       # Physical time; invariant under non-uniform intervals
+  emit_rul_cycles: true           # Secondary label (file count to failure); interval-dependent
+  emit_rul_frac: false            # Optional fractional life [0,1]; off by default
+
+  # Optional knee-capping (flat RUL until degradation onset, linear thereafter)
+  knee_capping:
+    enabled: false
+    r_early_minutes: null         # Null when disabled
+
+  # Splitting
+  split:
+    protocol: lobo_cv             # Unit-wise Leave-One-Bearing-Out cross-validation
+    val_from_train_early_fraction: 0.0   # Val set from train early life; 0.0 = no separate val
+
+  # Dataset run window (frozen)
+  run_window:
+    start: "2003-10-22"
+    end: "2003-11-25"
+
+  # Versioning
+  dataset_version: "1.0"
+  label_version: "1.0"
+
+  # Output paths
+  output_paths:
+    rul_labels: "data/processed/rul_labels.parquet"
+    training_dataset: "data/processed/training_dataset.parquet"
+    fold_assignments: "data/processed/splits/fold_assignments.parquet"
+    dataset_manifest: "reports/dataset_manifest.json"
+    label_dictionary: "reports/label_dictionary.json"
+    dataset_contract: "reports/phase5_dataset_contract.yaml"
+    leakage_report: "reports/leakage_report.md"
+    split_summary: "reports/split_summary.md"
+    validation_report: "reports/validation_report.md"
+    implementation_report: "reports/PHASE_5_IMPLEMENTATION_REPORT.md"
+
+decision_engine:
+
+  # ---------------------------------------------------------------------------
+  # THRESHOLD GOVERNANCE — architecture §9d
+  #
+  # These values are ENGINEERING ESTIMATES grounded in general published
+  # reliability-engineering reference points (cited below), NOT a fleet-
+  # or rig-specific calibration. Domain-expert validation by a qualified
+  # Reliability Engineer against this specific bearing/rig's actual P-F
+  # interval, crew logistics, and maintenance cost data is REQUIRED before
+  # any operational deployment (architecture §9b, §9d.1). Citing a source
+  # upgrades these from an unexplained placeholder to a defensible starting
+  # point — it does not substitute for that sign-off.
+  #
+  # Justification for each tier, with external reference points:
+  #
+  #   critical_minutes : 2880  = 48 hours  — minimum crew mobilisation time.
+  #     Cited industrial bearing replacement work (diagnosis + repair) runs
+  #     ~2-8h once a crew is on site, with ~1-2h emergency mobilisation lead
+  #     time on top; 48h is a conservative multiple of that observed range,
+  #     consistent with the "heat-by-touch" (very short, ~1-5 day) end of the
+  #     P-F interval spectrum where action cannot be deferred.
+  #     Sources: Fluke reliability field guide (P-F interval reference,
+  #     https://media.fluke.com/3c190f30-96ae-4ed2-ab78-b3e60179fd73_original%20file.pdf);
+  #     general emergency-repair response/mobilisation timelines (Automa,
+  #     https://automa.net/blog/1921/machine-maintenance-time-how-long).
+  #
+  #   high_minutes     : 7200  = 5 days    — unplanned-window lead time.
+  #     Sits inside the "half-interval" safety margin reliability engineers
+  #     apply to short-to-medium P-F interval bearing faults (detect at no
+  #     later than half the interval remaining) and within typical
+  #     "urgent-but-schedulable-this-week" maintenance response windows.
+  #     Source: F7 Reliability P-F interval guide, https://f7i.ai/blog/how-to-detect-bearing-failure-early-a-reliability-engineers-guide-to-the-p-f-interval
+  #
+  #   medium_minutes   : 20160 = 14 days   — planned-cycle scheduling horizon.
+  #     Reliability-engineering practice applies a "half-interval" inspection
+  #     rule to the P-F curve — e.g. an 8-week vibration-detectable P-F
+  #     interval implies a ~4-week maximum safe action window; 14 days is a
+  #     conservative fraction of that, and also sits inside the commonly
+  #     cited 2-4 week rolling maintenance-scheduling horizon used by most
+  #     CMMS/RCM planning practice.
+  #     Sources: ReliaMag P-F curve explainer, https://reliamag.com/articles/what-is-a-p-f-curve/;
+  #     maintenance scheduling-horizon guidance, https://www.getsockeye.com/blog/maintenance-scheduling/
+  #
+  #   low_minutes      : 43200 = 30 days   — outer monitoring-vigilance boundary.
+  #     A vibration-detected rolling-element-bearing P-F interval is commonly
+  #     cited at ~8 weeks (with early-stage detection offering up to ~3
+  #     months of lead time); a 30-day vigilance boundary sits comfortably
+  #     inside that window, leaving room to still detect and schedule before
+  #     the fault progresses to the HIGH/CRITICAL region.
+  #     Source: F7 Reliability P-F interval guide (as above).
+  #
+  # With median-baseline predictions (~14,726 min), these thresholds produce
+  # MEDIUM risk → SCHEDULE_MAINTENANCE, which is the expected demonstration output.
+  #
+  # Ordering constraint enforced at runtime: critical < high < medium < low
+  # Pipeline raises FATAL if any value is null (architecture §9d, DV1).
+  # ---------------------------------------------------------------------------
+  risk_thresholds:
+    critical_minutes: 2880     # cited estimate (see rationale above) — still requires domain expert validation
+    high_minutes: 7200         # cited estimate (see rationale above) — still requires domain expert validation
+    medium_minutes: 20160      # cited estimate (see rationale above) — still requires domain expert validation
+    low_minutes: 43200         # cited estimate (see rationale above) — still requires domain expert validation
+
+  confidence:
+    # Tolerance band around any threshold; predictions within ±N minutes
+    # of a boundary are classified as near-boundary (architecture §7.5a Factor 3).
+    boundary_proximity_tolerance_minutes: 288   # ±5% of critical_minutes
+
+    # Base confidence level assigned per model type before penalty application.
+    # Encoded here so a future model type automatically gets correct confidence.
+    model_type_modifiers:
+      mean: "LOW"
+      median: "LOW"
+      linear: "MEDIUM"
+      random_forest: "HIGH"
+      xgboost: "HIGH"
+
+  business_rules:
+    # Channel RUL spread above which BR-03 fires a confidence downgrade.
+    # PLACEHOLDER — requires domain expert validation. Unlike risk_thresholds
+    # above, this is a data-consistency diagnostic (are the two channels on
+    # the same bearing agreeing?), not a maintenance-lead-time decision, so
+    # no external reliability-engineering standard directly applies. Current
+    # value is grounded internally instead: ~43% of the Phase 6 mean MAE
+    # (11,530 min) — i.e. a channel disagreement of this size is comparable
+    # to the model's own baseline error budget, a reasonable (but still
+    # unvalidated) signal that the disagreement reflects real sensor/asset
+    # inconsistency rather than ordinary prediction noise.
+    channel_rul_spread_threshold_minutes: 5000
+
+    # Conservative fallback assigned when a bearing has no prediction row.
+    missing_prediction_default_risk: "HIGH"
+
+  explainability:
+    max_top_features_in_explanation: 5
+
+  # Priority matrix (architecture §7.6).
+  # Rows = risk category, cols = confidence level. Values must be integers 1–5.
+  priority_matrix:
+    CRITICAL:
+      HIGH: 1
+      MEDIUM: 1
+      LOW: 1
+    HIGH:
+      HIGH: 2
+      MEDIUM: 2
+      LOW: 3
+    MEDIUM:
+      HIGH: 3
+      MEDIUM: 3
+      LOW: 4
+    LOW:
+      HIGH: 4
+      MEDIUM: 4
+      LOW: 5
+    HEALTHY:
+      HIGH: 5
+      MEDIUM: 5
+      LOW: 5
+
+  # Maintenance action mapping (architecture §7.4).
+  policy_map:
+    CRITICAL: "IMMEDIATE_SHUTDOWN"
+    HIGH: "URGENT_MAINTENANCE"
+    MEDIUM: "SCHEDULE_MAINTENANCE"
+    LOW: "ROUTINE_MONITORING"
+    HEALTHY: "NORMAL_OPERATION"
+
+  # Must match RULE_VERSION in business_rules.py (architecture §7.9b).
+  rule_version: "1.0"
+
+  # Input paths (Phase 6 frozen artifacts consumed by Phase 7).
+  input_paths:
+    phase6_contract: "reports/phase6_model_contract.yaml"
+    phase6_predictions: "reports/model_predictions.parquet"
+    phase6_manifest: "reports/model_manifest.json"
+
+  # Output paths (architecture §6).
+  output_paths:
+    recommendations: "reports/recommendations.parquet"
+    decision_report: "reports/decision_report.md"
+    phase8_contract: "reports/phase7_decision_contract.yaml"
+    decision_manifest: "reports/decision_manifest.json"
+    decision_log: "reports/decision_log.json"
+    decision_validation_report: "reports/decision_validation_report.md"
+    implementation_report: "reports/PHASE_7_IMPLEMENTATION_REPORT.md"
+
+model_dev:
+  # Global reproducibility seed — threaded into every stochastic estimator
+  # and split operation (architecture §9, §16).
+  random_seed: 42
+
+  # Feature columns are NOT re-declared here — loaded at runtime from
+  # phase5_dataset_contract.yaml (contract_loader) to prevent drift (architecture §18).
+
+  # Channel grain handling (architecture §6). Default: treat each channel as an
+  # additional row (simplest, no feature invention). Aggregation is an optional,
+  # off-by-default modelling choice that never crosses the train/test boundary.
+  channel_handling:
+    mode: per_channel_rows      # per_channel_rows | aggregate
+    aggregate: false
+
+  baselines:
+    mean: true
+    median: true
+    linear: true
+
+  candidates:
+    random_forest: true
+    xgboost: true
+    lightgbm: false            # intentionally excluded — architecture §8.2
+    catboost: false            # intentionally excluded — architecture §8.2
+
+  # Fixed, documented, sensible defaults (architecture §9 — no tuning on n=2 by default)
+  model_params:
+    random_forest:
+      n_estimators: 200
+      max_depth: 8
+      min_samples_leaf: 5
+    xgboost:
+      n_estimators: 200
+      max_depth: 4
+      learning_rate: 0.05
+      subsample: 0.8
+      colsample_bytree: 0.8
+
+  preprocessing:
+    scaler: standard
+    imputer: median
+    fit_scope: train_fold_only   # structurally enforced: fit() only ever receives train-fold rows
+
+  # Optional, leakage-safe, constrained search — disabled by default (architecture §9)
+  hyperparameter_search:
+    enabled: false
+    method: within_train_unit_temporal
+    early_life_fraction: 0.3      # inner-val = earliest 30% of the TRAIN bearing's own timeline
+    early_stopping_rounds: 50
+    grid:
+      random_forest:
+        n_estimators: [100, 200]
+        max_depth: [5, 10]
+      xgboost:
+        n_estimators: [100, 200]
+        max_depth: [3, 5]
+        learning_rate: [0.05, 0.1]
+
+  metrics:
+    primary: mae
+    near_failure_threshold_minutes: 1440   # last 24h of observed life — reliability-critical region
+    report_asymmetry: true
+    top_n_residuals: 10                    # largest-residual inspection target (architecture §10.6)
+
+  # Operationalizes architecture §7b Model Promotion Criteria
+  promotion:
+    equivalence_margin_minutes: 30.0            # MAE delta below this = "not meaningfully different"
+    complexity_justification_multiplier: 1.5    # a more complex model must beat the margin by this factor
+
+  # Operationalizes architecture §10.5 Overfitting Policy
+  #
+  # NOTE (n=1 training-fold recalibration): under Leave-One-Bearing-Out with only
+  # two run-to-failure units, each fold trains on a SINGLE bearing. Any flexible
+  # learner can nearly interpolate one trajectory, driving train_mae toward 0 and
+  # the train/test ratio toward 0. The ratio is therefore a conservative diagnostic,
+  # not a discriminating gate, for this fold structure. The binding promotion
+  # constraint is the "beat both naive baselines on EVERY fold" rule (see
+  # model_selection.py) — a model that wins on one bearing but loses on the other
+  # is not promoted. Threshold raised from 0.3 to 0.85 ("train error not more than
+  # 15% better than test error") so the flag reflects the recalibrated policy; the
+  # gate is not the sole reason candidates are rejected. See ENGINEERING_DECISIONS.md.
+  overfitting_policy:
+    train_test_ratio_threshold: 0.85       # train_mae / test_mae below this => overfitting WARNING flag
+
+  # Operationalizes architecture §8.3 Best Model selection hierarchy
+  selection:
+    metric: mae
+    must_beat_baselines: true
+    instability_ratio_threshold: 2.0       # max(fold_mae)/min(fold_mae) above this => unstable, deprioritized
+    tie_breaker: simpler_model
+
+  refit_for_handoff:
+    enabled: true
+    population: all_rtf
+
+  input_paths:
+    phase5_contract: "reports/phase5_dataset_contract.yaml"
+
+  output_paths:
+    model_dir: "models"
+    model_predictions: "reports/model_predictions.parquet"
+    model_contract: "reports/phase6_model_contract.yaml"
+    evaluation_report: "reports/evaluation_report.md"
+    model_selection_report: "reports/model_selection_report.md"
+    feature_importance_report: "reports/feature_importance_report.md"
+    experiment_log: "reports/experiment_log.json"
+    model_manifest: "reports/model_manifest.json"
+    model_validation_report: "reports/model_validation_report.md"
+    implementation_report: "reports/PHASE_6_IMPLEMENTATION_REPORT.md"
+
+feature_engineering:
+  # Frequency bands for spectral energy features (in Hz)
+  frequency_bands:
+    - [0, 1000]      # Low-frequency band (shaft harmonics)
+    - [1000, 5000]   # Mid-frequency band
+    - [5000, 10000]  # High-frequency band
+
+  # Rolling window configuration for trend features
+  trend_window_size: 5  # Number of files in rolling window for slope/variance
+  chronology_gap_threshold_minutes: 30  # Max gap (minutes) to allow in a trend window
+
+  # FFT configuration
+  fft_window: "hann"       # Window function for FFT
+  samples_per_file: 20480  # Full acquisition length; the FFT is computed over the
+                           # ENTIRE record (no truncation). See frequency_domain_features.
+
+  # Envelope analysis (bandpass-then-Hilbert). The bandpass isolates the
+  # high-frequency structural resonance band where bearing impacts are amplified.
+  envelope_band_low_hz: 5000.0   # Lower edge of resonance bandpass
+  envelope_band_high_hz: 9000.0  # Upper edge (must be < Nyquist = 10000 Hz)
+
+  # Spectral entropy normalization
+  spectral_entropy_base: 2  # Natural log (e) or log base 2 for bits
+
+  # Output paths
+  feature_store_output: "data/processed/feature_store.parquet"
+  feature_manifest_output: "reports/feature_manifest.json"
+  feature_dictionary_output: "reports/feature_dictionary.json"
+  feature_report_output: "reports/feature_engineering_report.md"

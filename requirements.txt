@@ -1,0 +1,37 @@
+# =============================================================================
+# Bearing Remaining Useful Life Prediction & Maintenance Decision System
+# Complete, pinned dependency set. Versions match the validated environment
+# (Python >= 3.10). Every package listed below is imported by src/ or tests/,
+# except the two parquet/table backends noted inline (used implicitly by pandas).
+# =============================================================================
+
+# --- Core numerical / data stack ---
+numpy==2.4.6
+scipy==1.17.1
+pandas==2.3.3
+
+# --- Machine learning ---
+scikit-learn==1.9.0
+xgboost==3.2.0
+shap==0.52.0
+
+# --- Storage / IO ---
+pyarrow==24.0.0
+fastparquet==2026.5.0      # pandas parquet engine backend
+duckdb==1.5.3
+
+# --- Visualization ---
+matplotlib==3.10.9
+
+# --- Dashboard ---
+streamlit==1.58.0
+
+# --- Configuration ---
+PyYAML==6.0.3
+
+# --- Reporting ---
+markdown==3.10.2
+tabulate==0.10.0           # required by pandas DataFrame.to_markdown()
+
+# --- Testing ---
+pytest==9.0.3

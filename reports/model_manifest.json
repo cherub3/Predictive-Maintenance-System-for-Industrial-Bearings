@@ -1,0 +1,57 @@
+{
+  "phase": "6",
+  "model_version": "1.0",
+  "experiment_id": "exp_ea9a55b12542_seed42",
+  "config_fingerprint": "ea9a55b12542462801efe6f67b33bbd119df0e48805516be827653dec355305e",
+  "random_seed": 42,
+  "git_commit": "unknown",
+  "environment": {
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.2.0",
+    "shap": "0.52.0",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3"
+  },
+  "selected_model": "mean",
+  "selection_resolved_at_priority": 0,
+  "selection_resolved_by": "demotion_fallback",
+  "model_fingerprint": "3d17fcab1aa84405a303a79e9103a5e2853ee252e95d3150c4426a0f281b95f5",
+  "refit_model_fingerprint": "551236c0678b6ba065f55dbac02568e7a1def7a6fbc65ce0484368412a913e60",
+  "model_evaluations_summary": {
+    "mean": {
+      "mean_mae": 16538.847055953163,
+      "mae_spread": 6200.403258444183,
+      "stability_ratio": 1.4583145257634622
+    },
+    "median": {
+      "mean_mae": 16149.827225783923,
+      "mae_spread": 8798.013386747309,
+      "stability_ratio": 1.6918067902016014
+    },
+    "linear": {
+      "mean_mae": 18125.026875047777,
+      "mae_spread": 12347.152809515805,
+      "stability_ratio": 2.019250013906974
+    },
+    "random_forest": {
+      "mean_mae": 13218.448002471021,
+      "mae_spread": 7564.251718815985,
+      "stability_ratio": 1.771328990899209
+    },
+    "xgboost": {
+      "mean_mae": 12589.373702662035,
+      "mae_spread": 8031.965731251657,
+      "stability_ratio": 2.0456658729292987
+    }
+  },
+  "upstream_lineage": {
+    "phase5_contract_version": "1.0",
+    "phase5_dataset_version": "1.0",
+    "phase5_config_fingerprint": "c7d806aa69e43ff0bf7fdd90ddd3b3dc6f0030f1f7adba86d23133bf69391db4"
+  },
+  "statistical_limitations": {
+    "caveat": "With only 4 RTF units, LOBO CV produces 4 evaluation data points. Performance estimates cannot carry classical confidence intervals. Results should be interpreted as methodology validation, not fleet-level guarantees.",
+    "n_folds": 4,
+    "n_rtf_units": 4
+  }
+}

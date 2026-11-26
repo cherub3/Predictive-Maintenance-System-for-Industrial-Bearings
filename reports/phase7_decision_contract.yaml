@@ -1,0 +1,89 @@
+artifact_paths:
+  decision_manifest: reports/decision_manifest.json
+  decision_report: reports/decision_report.md
+  decision_validation_report: reports/decision_validation_report.md
+  recommendations: reports/recommendations.parquet
+consumer_expectations:
+  apply_domain_expert_validated_thresholds_before_operational_use: true
+  must_display_confidence_level_with_every_recommendation: true
+  must_display_model_type_and_selection_outcome: true
+  must_honour_business_rule_override_flags: true
+  must_honour_n2_caveat: true
+  must_not_aggregate_across_rule_versions: true
+  must_not_compare_experiments_with_different_config_fingerprints: true
+  must_not_use_shap_outputs_for_model_modification: true
+decision_schema:
+  confidence_levels:
+  - HIGH
+  - MEDIUM
+  - LOW
+  fields:
+  - bearing_id
+  - timestamp
+  - min_predicted_rul_minutes
+  - mean_predicted_rul_minutes
+  - channel_count
+  - risk_category
+  - maintenance_action
+  - confidence_level
+  - priority_score
+  - is_business_rule_override
+  - override_reason
+  - explanation_text
+  - model_type
+  - n2_caveat
+  - rule_version
+  - config_fingerprint
+  - experiment_id
+  grain:
+  - bearing_id
+  - timestamp
+  maintenance_actions:
+  - IMMEDIATE_SHUTDOWN
+  - URGENT_MAINTENANCE
+  - SCHEDULE_MAINTENANCE
+  - ROUTINE_MONITORING
+  - NORMAL_OPERATION
+  priority_range:
+  - 1
+  - 5
+  risk_categories:
+  - CRITICAL
+  - HIGH
+  - MEDIUM
+  - LOW
+  - HEALTHY
+decision_summary:
+  bearing_count: 4
+  risk_category_counts:
+    LOW: 5296
+    MEDIUM: 6323
+  total_recommendations: 11619
+performance_context:
+  model_selection_outcome: demotion_fallback
+  model_type: mean
+  n2_caveat: true
+  n2_caveat_text: With only 4 RTF units, LOBO CV produces 4 evaluation data points.
+    Performance estimates cannot carry classical confidence intervals. Results should
+    be interpreted as methodology validation, not fleet-level guarantees.
+  phase6_mean_mae_minutes: 16538.847055953163
+  phase6_stability_ratio: 1.4583145257634622
+producer:
+  config_fingerprint: d180986dfcd28c380863646bbd33d158e52acf84c1d0f108dd2e1c62c1258cb7
+  experiment_id: dec_d180986dfcd2_rv10
+  git_commit: unknown
+  module: decision_engine
+  phase: '7'
+  rule_version: '1.0'
+schema_version: '1.0'
+statistical_limitations:
+  confidence_type: categorical_only
+  extrapolation_permitted: false
+  n_rtf_units: 4
+  probability_estimates: false
+upstream_lineage:
+  phase6_config_fingerprint: ea9a55b12542462801efe6f67b33bbd119df0e48805516be827653dec355305e
+  phase6_experiment_id: exp_ea9a55b12542_seed42
+  phase6_model_fingerprint: 551236c0678b6ba065f55dbac02568e7a1def7a6fbc65ce0484368412a913e60
+  phase6_model_type: mean
+  phase6_n2_caveat: true

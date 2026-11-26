@@ -1,0 +1,95 @@
+[
+  {
+    "experiment_id": "dec_d180986dfcd2_rv10",
+    "config_fingerprint": "d180986dfcd28c380863646bbd33d158e52acf84c1d0f108dd2e1c62c1258cb7",
+    "rule_version": "1.0",
+    "phase6_upstream": {
+      "experiment_id": "exp_fce60a8d2a95_seed42",
+      "config_fingerprint": "fce60a8d2a9578f1147a6707f46faae1496db619c0ed084530723eedcd7a0736"
+    },
+    "summary": {
+      "total_recommendations": 4312,
+      "risk_category_counts": {
+        "MEDIUM": 4312
+      },
+      "business_rule_override_counts": {
+        "BR-01": 0,
+        "BR-02": 0,
+        "BR-03": 0,
+        "BR-04": 4312,
+        "BR-05": 0
+      }
+    },
+    "produced_at": "2026-07-04T17:48:33.275592+00:00"
+  },
+  {
+    "experiment_id": "dec_d180986dfcd2_rv10",
+    "config_fingerprint": "d180986dfcd28c380863646bbd33d158e52acf84c1d0f108dd2e1c62c1258cb7",
+    "rule_version": "1.0",
+    "phase6_upstream": {
+      "experiment_id": "exp_fce60a8d2a95_seed42",
+      "config_fingerprint": "fce60a8d2a9578f1147a6707f46faae1496db619c0ed084530723eedcd7a0736"
+    },
+    "summary": {
+      "total_recommendations": 4312,
+      "risk_category_counts": {
+        "MEDIUM": 4312
+      },
+      "business_rule_override_counts": {
+        "BR-01": 0,
+        "BR-02": 0,
+        "BR-03": 0,
+        "BR-04": 4312,
+        "BR-05": 0
+      }
+    },
+    "produced_at": "2026-07-04T18:18:46.636166+00:00"
+  },
+  {
+    "experiment_id": "dec_d180986dfcd2_rv10",
+    "config_fingerprint": "d180986dfcd28c380863646bbd33d158e52acf84c1d0f108dd2e1c62c1258cb7",
+    "rule_version": "1.0",
+    "phase6_upstream": {
+      "experiment_id": "exp_ea9a55b12542_seed42",
+      "config_fingerprint": "ea9a55b12542462801efe6f67b33bbd119df0e48805516be827653dec355305e"
+    },
+    "summary": {
+      "total_recommendations": 4312,
+      "risk_category_counts": {
+        "MEDIUM": 4312
+      },
+      "business_rule_override_counts": {
+        "BR-01": 0,
+        "BR-02": 0,
+        "BR-03": 0,
+        "BR-04": 4312,
+        "BR-05": 0
+      }
+    },
+    "produced_at": "2026-07-30T16:26:54.175636+00:00"
+  },
+  {
+    "experiment_id": "dec_d180986dfcd2_rv10",
+    "config_fingerprint": "d180986dfcd28c380863646bbd33d158e52acf84c1d0f108dd2e1c62c1258cb7",
+    "rule_version": "1.0",
+    "phase6_upstream": {
+      "experiment_id": "exp_ea9a55b12542_seed42",
+      "config_fingerprint": "ea9a55b12542462801efe6f67b33bbd119df0e48805516be827653dec355305e"
+    },
+    "summary": {
+      "total_recommendations": 11619,
+      "risk_category_counts": {
+        "MEDIUM": 6323,
+        "LOW": 5296
+      },
+      "business_rule_override_counts": {
+        "BR-01": 0,
+        "BR-02": 0,
+        "BR-03": 0,
+        "BR-04": 11619,
+        "BR-05": 0
+      }
+    },
+    "produced_at": "2026-07-31T19:00:44.914775+00:00"
+  }
+]

@@ -1,0 +1,226 @@
+{
+  "manifest_version": "1.0",
+  "dataset_version": "1.0",
+  "generated_at": "2026-07-31T18:41:36.868683+00:00",
+  "config_fingerprint": "c7d806aa69e43ff0bf7fdd90ddd3b3dc6f0030f1f7adba86d23133bf69391db4",
+  "split_protocol": "lobo_cv",
+  "rtf_units": [
+    "set1::bearing_3",
+    "set1::bearing_4",
+    "set2::bearing_1",
+    "set3::bearing_3"
+  ],
+  "censored_units": [
+    "set1::bearing_1",
+    "set1::bearing_2",
+    "set2::bearing_2",
+    "set2::bearing_3",
+    "set2::bearing_4",
+    "set3::bearing_1",
+    "set3::bearing_2",
+    "set3::bearing_4"
+  ],
+  "total_training_rows": 15931,
+  "total_training_columns": 25,
+  "feature_columns": [
+    "env_bpfi_energy",
+    "env_bpfo_energy",
+    "env_bsf_energy",
+    "fd_band_energy_0_1000",
+    "fd_band_energy_1000_5000",
+    "fd_band_energy_5000_10000",
+    "fd_spectral_centroid",
+    "fd_spectral_entropy",
+    "td_crest_factor",
+    "td_kurtosis",
+    "td_rms",
+    "trend_kurtosis_slope",
+    "trend_rms_slope",
+    "trend_rms_variance"
+  ],
+  "label_columns": [
+    "fold_1_role",
+    "fold_2_role",
+    "fold_3_role",
+    "fold_4_role",
+    "rul_cycles",
+    "rul_minutes"
+  ],
+  "grain_columns": [
+    "unit_id",
+    "channel",
+    "timestamp"
+  ],
+  "per_unit": {
+    "set1::bearing_3": {
+      "type": "rtf",
+      "training_rows": 4312,
+      "label_rows": 4312,
+      "fold_1_role": "test",
+      "fold_2_role": "train",
+      "fold_3_role": "train",
+      "fold_4_role": "train"
+    },
+    "set1::bearing_4": {
+      "type": "rtf",
+      "training_rows": 4312,
+      "label_rows": 4312,
+      "fold_1_role": "train",
+      "fold_2_role": "test",
+      "fold_3_role": "train",
+      "fold_4_role": "train"
+    },
+    "set2::bearing_1": {
+      "type": "rtf",
+      "training_rows": 984,
+      "label_rows": 984,
+      "fold_1_role": "train",
+      "fold_2_role": "train",
+      "fold_3_role": "test",
+      "fold_4_role": "train"
+    },
+    "set3::bearing_3": {
+      "type": "rtf",
+      "training_rows": 6323,
+      "label_rows": 6323,
+      "fold_1_role": "train",
+      "fold_2_role": "train",
+      "fold_3_role": "train",
+      "fold_4_role": "test"
+    },
+    "set1::bearing_1": {
+      "type": "censored",
+      "training_rows": 0,
+      "label_rows": 4312,
+      "fold_1_role": null,
+      "fold_2_role": null,
+      "fold_3_role": null,
+      "fold_4_role": null
+    },
+    "set1::bearing_2": {
+      "type": "censored",
+      "training_rows": 0,
+      "label_rows": 4312,
+      "fold_1_role": null,
+      "fold_2_role": null,
+      "fold_3_role": null,
+      "fold_4_role": null
+    },
+    "set2::bearing_2": {
+      "type": "censored",
+      "training_rows": 0,
+      "label_rows": 984,
+      "fold_1_role": null,
+      "fold_2_role": null,
+      "fold_3_role": null,
+      "fold_4_role": null
+    },
+    "set2::bearing_3": {
+      "type": "censored",
+      "training_rows": 0,
+      "label_rows": 984,
+      "fold_1_role": null,
+      "fold_2_role": null,
+      "fold_3_role": null,
+      "fold_4_role": null
+    },
+    "set2::bearing_4": {
+      "type": "censored",
+      "training_rows": 0,
+      "label_rows": 984,
+      "fold_1_role": null,
+      "fold_2_role": null,
+      "fold_3_role": null,
+      "fold_4_role": null
+    },
+    "set3::bearing_1": {
+      "type": "censored",
+      "training_rows": 0,
+      "label_rows": 6323,
+      "fold_1_role": null,
+      "fold_2_role": null,
+      "fold_3_role": null,
+      "fold_4_role": null
+    },
+    "set3::bearing_2": {
+      "type": "censored",
+      "training_rows": 0,
+      "label_rows": 6323,
+      "fold_1_role": null,
+      "fold_2_role": null,
+      "fold_3_role": null,
+      "fold_4_role": null
+    },
+    "set3::bearing_4": {
+      "type": "censored",
+      "training_rows": 0,
+      "label_rows": 6323,
+      "fold_1_role": null,
+      "fold_2_role": null,
+      "fold_3_role": null,
+      "fold_4_role": null
+    }
+  },
+  "fold_summary": {
+    "fold_1": {
+      "train_rows": 11619,
+      "test_rows": 4312,
+      "train_units": [
+        "set1::bearing_4",
+        "set2::bearing_1",
+        "set3::bearing_3"
+      ],
+      "test_units": [
+        "set1::bearing_3"
+      ]
+    },
+    "fold_2": {
+      "train_rows": 11619,
+      "test_rows": 4312,
+      "train_units": [
+        "set1::bearing_3",
+        "set2::bearing_1",
+        "set3::bearing_3"
+      ],
+      "test_units": [
+        "set1::bearing_4"
+      ]
+    },
+    "fold_3": {
+      "train_rows": 14947,
+      "test_rows": 984,
+      "train_units": [
+        "set1::bearing_3",
+        "set1::bearing_4",
+        "set3::bearing_3"
+      ],
+      "test_units": [
+        "set2::bearing_1"
+      ]
+    },
+    "fold_4": {
+      "train_rows": 9608,
+      "test_rows": 6323,
+      "train_units": [
+        "set1::bearing_3",
+        "set1::bearing_4",
+        "set2::bearing_1"
+      ],
+      "test_units": [
+        "set3::bearing_3"
+      ]
+    }
+  },
+  "artifact_fingerprints": {
+    "rul_labels": "4e017b8c079a38ca8dd20750f052a2333d0ad0b325c8eb4d35afaebabb9d9f1b",
+    "training_dataset": "5ca9bfda5930f7e597184fdbb248ad529f3c4d0a874b4bafa7e7ccb6bfd82cea",
+    "fold_assignments": "1bc93782adfd9a58b239b562ad8d7e579da861d9c952110caead3c3bc2095f6a",
+    "dataset_manifest": "09b651dd3699c0ecab97c029cc19237bb5a3d44e74bfdf0959b8eadd394310b8",
+    "label_dictionary": "970eb9dcd94a5ae4c36d8741ae0b66f4f877544fe36691c43d30783093c15274",
+    "dataset_contract": "03d7666e793d142ce1822f4b60def2b024629d30b9fdcfd454b70a16685426a5",
+    "leakage_report": "0b8bc736e3e84e78e484f4a2668dbf25133144f8b78485a658124fcc87597b6e",
+    "split_summary": "0b5863432dc7cc8f0351ced438ab91541cc3fb02d768fbf957d81ce15eefaa58",
+    "validation_report": "1e42d386bbc249ec9270ce0d5d0cf07281f4b65d0fd485d6b26e3f1c0da813f1",
+    "implementation_report": "ebf78073e76196acecd1ae7eceedeb88c0c9c6df99f62bae65a9ce34f71a7368"
+  }
+}

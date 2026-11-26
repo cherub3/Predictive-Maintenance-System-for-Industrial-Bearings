@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0",
+  "label_version": "1.0",
+  "rul_definition": {
+    "formula": "RUL(t) = (t_fail - t).total_seconds() / 60",
+    "t_fail_definition": "max(timestamp) of that unit's valid acquisition files",
+    "failure_model": "instantaneous at final acquisition timestamp",
+    "primary_unit": "minutes"
+  },
+  "unit_classification": {
+    "rtf_units": [
+      "set1::bearing_3",
+      "set1::bearing_4",
+      "set2::bearing_1",
+      "set3::bearing_3"
+    ],
+    "censored_units": [
+      "set1::bearing_1",
+      "set1::bearing_2",
+      "set2::bearing_2",
+      "set2::bearing_3",
+      "set2::bearing_4",
+      "set3::bearing_1",
+      "set3::bearing_2",
+      "set3::bearing_4"
+    ]
+  },
+  "label_columns": [
+    {
+      "name": "rul_minutes",
+      "dtype": "float64",
+      "unit": "minutes",
+      "description": "Remaining useful life in minutes. RUL(t) = (t_fail - t) in minutes; RUL(t_fail) = 0. NaN for censored (right-censored survivor) units.",
+      "null_for_units": [
+        "set1::bearing_1",
+        "set1::bearing_2",
+        "set2::bearing_2",
+        "set2::bearing_3",
+        "set2::bearing_4",
+        "set3::bearing_1",
+        "set3::bearing_2",
+        "set3::bearing_4"
+      ],
+      "rtf_range": {
+        "min": 0.0,
+        "max": 64385.15
+      },
+      "rtf_at_failure": 0.0
+    },
+    {
+      "name": "rul_cycles",
+      "dtype": "float64",
+      "unit": "acquisition_cycles",
+      "description": "Remaining cycles (count of unique future timestamps for this unit). Complementary to rul_minutes. NaN for censored units.",
+      "null_for_units": [
+        "set1::bearing_1",
+        "set1::bearing_2",
+        "set2::bearing_2",
+        "set2::bearing_3",
+        "set2::bearing_4",
+        "set3::bearing_1",
+        "set3::bearing_2",
+        "set3::bearing_4"
+      ],
+      "rtf_range": {
+        "min": 0.0,
+        "max": 6322.0
+      },
+      "rtf_at_failure": 0
+    },
+    {
+      "name": "is_censored",
+      "dtype": "bool",
+      "unit": null,
+      "description": "True for right-censored units (surviving bearings without failure event). These rows have NULL ground-truth RUL and must not be used as supervision.",
+      "null_for_units": [],
+      "true_for_units": [
+        "set1::bearing_1",
+        "set1::bearing_2",
+        "set2::bearing_2",
+        "set2::bearing_3",
+        "set2::bearing_4",
+        "set3::bearing_1",
+        "set3::bearing_2",
+        "set3::bearing_4"
+      ],
+      "false_for_units": [
+        "set1::bearing_3",
+        "set1::bearing_4",
+        "set2::bearing_1",
+        "set3::bearing_3"
+      ]
+    }
+  ],
+  "per_unit_statistics": {
+    "set1::bearing_3": {
+      "total_life_minutes": 49653.53333333333,
+      "total_cycles": 2156,
+      "min_rul_minutes": 0.0,
+      "max_rul_minutes": 49653.53333333333
+    },
+    "set1::bearing_4": {
+      "total_life_minutes": 49653.53333333333,
+      "total_cycles": 2156,
+      "min_rul_minutes": 0.0,
+      "max_rul_minutes": 49653.53333333333
+    },
+    "set2::bearing_1": {
+      "total_life_minutes": 9830.0,
+      "total_cycles": 984,
+      "min_rul_minutes": 0.0,
+      "max_rul_minutes": 9830.0
+    },
+    "set3::bearing_3": {
+      "total_life_minutes": 64385.15,
+      "total_cycles": 6323,
+      "min_rul_minutes": 0.0,
+      "max_rul_minutes": 64385.15
+    }
+  }
+}

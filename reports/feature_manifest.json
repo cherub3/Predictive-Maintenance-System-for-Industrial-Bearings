@@ -1,0 +1,90 @@
+{
+  "feature_store_metadata": {
+    "version": "1.0",
+    "phase": 4,
+    "phase_version": "4.0",
+    "phase_3_dependency_version": "1.0",
+    "feature_catalog_version": "1.0",
+    "build_timestamp": "2026-07-31T18:27:56.523696Z",
+    "built_by": "Feature Engineering Pipeline (Phase 4)",
+    "configuration_version": "1.0",
+    "dataset_version": "NASA IMS Set 1+2+3 (multi-dataset)",
+    "dataset_source": "NASA IMS Bearing Dataset, Sets 1/2/3 combined",
+    "number_of_features": 14,
+    "number_of_records": 46476,
+    "processing_duration_seconds": 636.19,
+    "feature_store_location": "data\\processed\\feature_store.parquet"
+  },
+  "feature_gate_decisions": {
+    "skewness": {
+      "included": false,
+      "reason": "Mean absolute skewness across all channels = 0.0525; threshold = 0.5. Gate set to False.",
+      "source": "reports\\phase3_gating_decisions.yaml"
+    },
+    "rolling_variance": {
+      "included": true,
+      "reason": "Pearson r(rolling_slope, rolling_variance) = 0.3564; threshold = 0.8. Gate set to True.",
+      "source": "reports\\phase3_gating_decisions.yaml"
+    },
+    "envelope_features": {
+      "included": true,
+      "reason": "Bearing geometry verified. Envelope features enabled pending signal characteristic analysis.",
+      "source": "reports\\phase3_gating_decisions.yaml"
+    },
+    "xy_energy_ratio": {
+      "included": false,
+      "reason": "X/Y RMS ratio CV = 0.0454 across all bearings and timestamps; threshold = 0.15. Gate set to False.",
+      "source": "reports\\phase3_gating_decisions.yaml"
+    }
+  },
+  "dependencies": [
+    {
+      "dependency": "Phase 1 Metadata",
+      "version": "1.0",
+      "file": "data/processed/metadata.parquet",
+      "usage": "Bearing ID, channel ID, timestamp, file structure"
+    },
+    {
+      "dependency": "Phase 3 Health Indicators",
+      "version": "1.0",
+      "file": "data/processed/signal_health_indicators.parquet",
+      "usage": "RMS, Kurtosis, Crest Factor, Skewness (reused, not recomputed)"
+    },
+    {
+      "dependency": "Phase 3 Bearing Geometry",
+      "version": "1.0",
+      "file": "src/signal_analysis/bearing_geometry.py (if verified)",
+      "usage": "Defect frequency constants for envelope features"
+    }
+  ],
+  "features_included": [
+    "td_rms",
+    "td_kurtosis",
+    "td_crest_factor",
+    "fd_band_energy_0_1000",
+    "fd_band_energy_1000_5000",
+    "fd_band_energy_5000_10000",
+    "fd_spectral_centroid",
+    "fd_spectral_entropy",
+    "trend_rms_slope",
+    "trend_kurtosis_slope",
+    "trend_rms_variance",
+    "env_bpfo_energy",
+    "env_bpfi_energy",
+    "env_bsf_energy"
+  ],
+  "features_excluded": [
+    {
+      "feature": "Peak-to-Peak Amplitude",
+      "reason": "Redundant with RMS + Crest Factor"
+    },
+    {
+      "feature": "Raw Shannon Entropy",
+      "reason": "Redundant with Kurtosis/Skewness"
+    },
+    {
+      "feature": "Variance",
+      "reason": "Redundant with RMS"
+    }
+  ]
+}

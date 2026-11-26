@@ -1,0 +1,34 @@
+# phase3_gating_decisions.yaml
+# Machine-readable Phase 3 gate decisions for Phase 4 feature_gate.py.
+# DO NOT edit manually. Generated automatically by Phase 3 pipeline.
+# Human-readable findings: reports/engineering_findings.md
+
+schema_version: '1.0'
+producer:
+  phase: phase_3_signal_analysis
+  module: src/signal_analysis/main.py
+  generated_at: '2026-07-31T18:11:47Z'
+  git_commit: unknown
+  config_version: c7d806aa69e43ff0
+bearing_geometry:
+  verified: true
+  source: bearing_geometry.py
+gate_decisions:
+  skewness:
+    include: false
+    justification: Mean absolute skewness across all channels = 0.0525; threshold
+      = 0.5. Gate set to False.
+  rolling_variance:
+    include: true
+    justification: Pearson r(rolling_slope, rolling_variance) = 0.3564; threshold
+      = 0.8. Gate set to True.
+  envelope_features:
+    include: true
+    justification: Bearing geometry verified. Envelope features enabled pending signal
+      characteristic analysis.
+  xy_energy_ratio:
+    include: false
+    justification: X/Y RMS ratio CV = 0.0454 across all bearings and timestamps; threshold
+      = 0.15. Gate set to False.
+validation:
+  all_gates_present: true

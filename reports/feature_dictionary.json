@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "phase": 4,
+  "generated": "2026-07-31T18:27:56.525854Z",
+  "features": {
+    "td_rms": {
+      "feature_name": "td_rms",
+      "short_description": "Root Mean Square vibration energy",
+      "engineering_meaning": "Proportional to mechanical energy dissipated by the vibrating structure",
+      "units": "Signal amplitude units (typically acceleration in g or velocity in in/s)",
+      "physical_formula": "RMS = sqrt(mean(signal^2))",
+      "source_module": "time_domain_features.py (reuses Phase 3 computation)",
+      "input_signal": "Raw vibration waveform, 20,480 samples at 20 kHz",
+      "dependencies": [
+        "Phase 3 signal_health_indicators.parquet"
+      ],
+      "expected_behaviour": "Flat during health; gradual rise during degradation; accelerating rise near failure",
+      "feature_family": "Time-Domain Statistical",
+      "family_prefix": "td_",
+      "phase_introduced": 3,
+      "version": "1.0",
+      "status": "included",
+      "gate_condition": "None (always included)"
+    },
+    "td_kurtosis": {
+      "feature_name": "td_kurtosis",
+      "short_description": "Kurtosis (impulsiveness of amplitude distribution)",
+      "engineering_meaning": "Measures presence of high-amplitude, short-duration impact events",
+      "units": "Dimensionless",
+      "physical_formula": "Kurtosis = E[(X - \u03bc)^4] / \u03c3^4 (Gaussian baseline \u2248 3)",
+      "source_module": "time_domain_features.py (reuses Phase 3 computation)",
+      "input_signal": "Raw vibration waveform, 20,480 samples at 20 kHz",
+      "dependencies": [
+        "Phase 3 signal_health_indicators.parquet"
+      ],
+      "expected_behaviour": "\u22483 in health; rises during degradation; may decline near failure (documented non-monotonic behavior)",
+      "feature_family": "Time-Domain Statistical",
+      "family_prefix": "td_",
+      "phase_introduced": 3,
+      "version": "1.0",
+      "status": "included",
+      "gate_condition": "None (always included)",
+      "notes": "Non-monotonic near failure is expected physical behavior, not a computation error"
+    },
+    "td_crest_factor": {
+      "feature_name": "td_crest_factor",
+      "short_description": "Crest Factor (peak-to-RMS ratio)",
+      "engineering_meaning": "How 'spiky' the waveform is relative to average energy",
+      "units": "Dimensionless ratio",
+      "physical_formula": "Crest Factor = max(|signal|) / RMS",
+      "source_module": "time_domain_features.py (reuses Phase 3 computation)",
+      "input_signal": "Raw vibration waveform, 20,480 samples at 20 kHz",
+      "dependencies": [
+        "Phase 3 signal_health_indicators.parquet"
+      ],
+      "expected_behaviour": "Low in health; rises ahead of RMS during degradation; may fall as RMS denominator grows faster",
+      "feature_family": "Time-Domain Statistical",
+      "family_prefix": "td_",
+      "phase_introduced": 3,
+      "version": "1.0",
+      "status": "included",
+      "gate_condition": "None (always included)"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "phase": "8",
+  "module": "dashboard",
+  "version": "1.0",
+  "produced_at": "2026-07-04T19:30:00Z",
+  "framework": "Streamlit",
+  "dependencies": {
+    "streamlit": ">=1.30.0",
+    "pandas": ">=2.0.0",
+    "pyarrow": ">=14.0.0"
+  },
+  "implemented_views": [
+    "landing",
+    "maintenance_center",
+    "bearing_detail",
+    "signal_analysis",
+    "model_diagnostics",
+    "governance"
+  ],
+  "validation_strategy": "fail_closed"
+}

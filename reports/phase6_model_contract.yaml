@@ -1,0 +1,115 @@
+consumer_expectations:
+  apply_decision_thresholds_on_top_of_raw_predictions: true
+  feed_features_in_exact_contract_schema: true
+  honour_late_prediction_risk_direction: true
+  must_not_retrain_or_retune: true
+  must_not_use_shap_outputs_for_model_modification: true
+  treat_performance_as_n2_estimate_not_fleet_sla: true
+error_analysis_summary:
+  bias_direction: over_predicts_late_warning
+  mean_signed_error_minutes: 4262.307285995652
+experiment:
+  config_fingerprint: ea9a55b12542462801efe6f67b33bbd119df0e48805516be827653dec355305e
+  experiment_id: exp_ea9a55b12542_seed42
+  random_seed: 42
+feature_importance:
+  top_permutation_ranked_features: []
+limitations:
+  extrapolation_permitted: false
+  failure_modes:
+  - inner_race
+  - outer_race
+  - rolling_element
+  n_rtf_units: 4
+  operating_regime: constant
+model:
+  fold_models_path: models\exp_ea9a55b12542_seed42\model.pkl
+  model_fingerprint: 551236c0678b6ba065f55dbac02568e7a1def7a6fbc65ce0484368412a913e60
+  path: models\exp_ea9a55b12542_seed42\refit_model.pkl
+  preprocessing:
+    fit_scope: train_fold_only
+    imputer: median
+    scaler: standard
+  training_population:
+    rtf_units:
+    - set1::bearing_3
+    - set1::bearing_4
+    - set2::bearing_1
+    - set3::bearing_3
+  type: mean
+performance:
+  mae_spread_minutes: 6200.403258444183
+  mean_mae_minutes: 16538.847055953163
+  n2_caveat: true
+  n2_caveat_text: With only 4 RTF units, LOBO CV produces 4 evaluation data points.
+    Performance estimates cannot carry classical confidence intervals. Results should
+    be interpreted as methodology validation, not fleet-level guarantees.
+  per_fold:
+    fold_1:
+      late_prediction_rate: 0.7161410018552876
+      mae: 13528.7077103121
+      near_failure_mae: 24451.13258080819
+      r2: -0.17969509201671774
+      rmse: 15320.786077965382
+      signed_error: 5979.491736731628
+      test_bearing: set1::bearing_3
+    fold_2:
+      late_prediction_rate: 0.7161410018552876
+      mae: 13528.7077103121
+      near_failure_mae: 24451.13258080819
+      r2: -0.17969509201671774
+      rmse: 15320.786077965382
+      signed_error: 5979.491736731628
+      test_bearing: set1::bearing_4
+    fold_3:
+      late_prediction_rate: 1.0
+      mae: 19729.110968756282
+      near_failure_mae: 23924.110968756286
+      r2: -48.23991443793207
+      rmse: 19932.55154976818
+      signed_error: 19729.110968756282
+      test_bearing: set2::bearing_1
+    fold_4:
+      late_prediction_rate: 0.2720227739996837
+      mae: 19368.86183443217
+      near_failure_mae: 16895.362586733274
+      r2: -0.621613709012016
+      rmse: 23643.99322756173
+      signed_error: -14638.865298236933
+      test_bearing: set3::bearing_3
+  stability_ratio: 1.4583145257634622
+prediction_schema:
+  grain:
+  - unit_id
+  - channel
+  - timestamp
+  input_features:
+  - env_bpfi_energy
+  - env_bpfo_energy
+  - env_bsf_energy
+  - fd_band_energy_0_1000
+  - fd_band_energy_1000_5000
+  - fd_band_energy_5000_10000
+  - fd_spectral_centroid
+  - fd_spectral_entropy
+  - td_crest_factor
+  - td_kurtosis
+  - td_rms
+  - trend_kurtosis_slope
+  - trend_rms_slope
+  - trend_rms_variance
+  output: predicted_rul_minutes
+  output_constraint: non_negative
+  output_dtype: float
+  units: minutes
+producer:
+  config_fingerprint: ea9a55b12542462801efe6f67b33bbd119df0e48805516be827653dec355305e
+  git_commit: unknown
+  module: model_dev
+  phase: '6'
+schema_version: '1.0'
+versioning:
+  experiment_id: exp_ea9a55b12542_seed42
+  model_version: '1.0'
+  upstream_contract_schema_version: '1.0'
+  upstream_dataset_version: '1.0'

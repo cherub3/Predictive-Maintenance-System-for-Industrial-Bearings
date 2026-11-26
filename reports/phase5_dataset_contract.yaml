@@ -1,0 +1,151 @@
+artifacts:
+  fold_assignments:
+    folds:
+      fold_1:
+        test_units:
+        - set1::bearing_3
+        train_units:
+        - set1::bearing_4
+        - set2::bearing_1
+        - set3::bearing_3
+      fold_2:
+        test_units:
+        - set1::bearing_4
+        train_units:
+        - set1::bearing_3
+        - set2::bearing_1
+        - set3::bearing_3
+      fold_3:
+        test_units:
+        - set2::bearing_1
+        train_units:
+        - set1::bearing_3
+        - set1::bearing_4
+        - set3::bearing_3
+      fold_4:
+        test_units:
+        - set3::bearing_3
+        train_units:
+        - set1::bearing_3
+        - set1::bearing_4
+        - set2::bearing_1
+    format: parquet
+    path: data/processed/splits/fold_assignments.parquet
+    protocol: lobo_cv
+  rul_labels:
+    censored_units:
+    - set1::bearing_1
+    - set1::bearing_2
+    - set2::bearing_2
+    - set2::bearing_3
+    - set2::bearing_4
+    - set3::bearing_1
+    - set3::bearing_2
+    - set3::bearing_4
+    format: parquet
+    path: data/processed/rul_labels.parquet
+    rtf_units: &id001
+    - set1::bearing_3
+    - set1::bearing_4
+    - set2::bearing_1
+    - set3::bearing_3
+    units_included:
+    - set1::bearing_3
+    - set1::bearing_4
+    - set2::bearing_1
+    - set3::bearing_3
+    - set1::bearing_1
+    - set1::bearing_2
+    - set2::bearing_2
+    - set2::bearing_3
+    - set2::bearing_4
+    - set3::bearing_1
+    - set3::bearing_2
+    - set3::bearing_4
+  training_dataset:
+    format: parquet
+    grain:
+    - unit_id
+    - channel
+    - timestamp
+    path: data/processed/training_dataset.parquet
+    total_columns: 25
+    total_rows: 15931
+    units: *id001
+columns:
+  features:
+  - env_bpfi_energy
+  - env_bpfo_energy
+  - env_bsf_energy
+  - fd_band_energy_0_1000
+  - fd_band_energy_1000_5000
+  - fd_band_energy_5000_10000
+  - fd_spectral_centroid
+  - fd_spectral_entropy
+  - td_crest_factor
+  - td_kurtosis
+  - td_rms
+  - trend_kurtosis_slope
+  - trend_rms_slope
+  - trend_rms_variance
+  fold_roles:
+  - fold_1_role
+  - fold_2_role
+  - fold_3_role
+  - fold_4_role
+  grain:
+  - unit_id
+  - channel
+  - timestamp
+  labels:
+  - rul_minutes
+  - rul_cycles
+  metadata:
+  - is_censored
+  - dataset_id
+  - bearing_id
+config_fingerprint: c7d806aa69e43ff0bf7fdd90ddd3b3dc6f0030f1f7adba86d23133bf69391db4
+consumed_by: Phase 6 Feature Scaling, Model Training & Evaluation
+contract_version: '1.0'
+dataset_version: '1.0'
+label_version: '1.0'
+phase: '5'
+phase6_requirements:
+  label_handling:
+    censored_rows: Censored units (set1::bearing_1, set1::bearing_2, set2::bearing_2,
+      set2::bearing_3, set2::bearing_4, set3::bearing_1, set3::bearing_2, set3::bearing_4)
+      have NaN labels. Do NOT impute, fabricate, or include them in supervised loss.
+      They may be used for unsupervised or semi-supervised methods only with explicit
+      architectural justification.
+    primary_supervision_signal: rul_minutes
+  leakage_prevention:
+    inherited: 'All L-01 through L-09 checks were verified by Phase 5 leakage_validator.
+      Phase 6 must not introduce new leakage vectors. In particular: no global statistics
+      on input features before fold-aware split.'
+  scaling:
+    forbidden:
+    - fit_on_full_dataset
+    - fit_on_test_fold
+    instruction: Feature scaling MUST be fit on the training fold only within each
+      LOBO fold. Do NOT fit scaler on the full training_dataset. Scaler must be applied
+      identically to the test fold using the train-fold parameters.
+  split_protocol:
+    forbidden:
+    - random_row_split
+    - time_based_row_split
+    - recomputing_splits_independently
+    must_use: fold_1_role, fold_2_role, fold_3_role, fold_4_role columns in training_dataset.parquet
+produced_by: Phase 5 RUL Target Construction & Leakage Prevention
+rul_specification:
+  definition: RUL(t) = (t_fail - t).total_seconds() / 60
+  monotone_constraint: non_increasing
+  primary_target: rul_minutes
+  t_fail: max(timestamp) of RTF unit's valid acquisition files
+  unit: minutes
+  value_at_failure: 0.0
+statistical_limitations:
+  caveat: With only 4 RTF units, LOBO CV produces 4 evaluation data points. Performance
+    estimates cannot carry classical confidence intervals. Results should be interpreted
+    as methodology validation, not fleet-level guarantees.
+  n_folds: 4
+  n_rtf_units: 4

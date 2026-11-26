@@ -1,0 +1,101 @@
+{
+  "phase": "7",
+  "module": "decision_engine",
+  "experiment_id": "dec_d180986dfcd2_rv10",
+  "config_fingerprint": "d180986dfcd28c380863646bbd33d158e52acf84c1d0f108dd2e1c62c1258cb7",
+  "rule_version": "1.0",
+  "git_commit": "unknown",
+  "environment": {
+    "pandas": "2.3.3",
+    "numpy": "2.4.6",
+    "scikit-learn": "1.9.0",
+    "pyyaml": "6.0.3",
+    "pyarrow": "24.0.0"
+  },
+  "phase6_upstream": {
+    "experiment_id": "exp_ea9a55b12542_seed42",
+    "config_fingerprint": "ea9a55b12542462801efe6f67b33bbd119df0e48805516be827653dec355305e",
+    "model_type": "mean",
+    "model_fingerprint": "551236c0678b6ba065f55dbac02568e7a1def7a6fbc65ce0484368412a913e60"
+  },
+  "decision_summary": {
+    "total_recommendations": 11619,
+    "bearing_count": 4,
+    "risk_category_counts": {
+      "MEDIUM": 6323,
+      "LOW": 5296
+    },
+    "business_rule_override_count": 11619,
+    "override_counts_by_rule": {
+      "BR-01": 0,
+      "BR-02": 0,
+      "BR-03": 0,
+      "BR-04": 11619,
+      "BR-05": 0
+    }
+  },
+  "statistical_limitations": {
+    "n_rtf_units": 4,
+    "n2_caveat": true,
+    "model_selection_outcome": "demotion_fallback",
+    "confidence_basis": "categorical_only_n2_insufficient_for_probabilities"
+  },
+  "produced_at": "2026-07-31T19:00:44.799290+00:00",
+  "artifacts": [
+    {
+      "path": "reports/recommendations.parquet",
+      "sha256": "a9c93d05b6f88dec3e4c602af076c23374a2668755f4f0069199e816512b154e",
+      "missing": false
+    },
+    {
+      "path": "reports/phase7_decision_contract.yaml",
+      "sha256": "e4b539627f19b7ec08012d5e7d6f2aa8a5d483f0bb28937e058dc8b68dd34148",
+      "missing": false
+    },
+    {
+      "path": "reports/decision_report.md",
+      "sha256": "3fb878b91671f6e43427c67da73302870f4273b76b4681379c7acdd06897acea",
+      "missing": false
+    },
+    {
+      "path": "reports/split_summary.md",
+      "sha256": "0b5863432dc7cc8f0351ced438ab91541cc3fb02d768fbf957d81ce15eefaa58",
+      "missing": false
+    },
+    {
+      "path": "reports/engineering_findings.md",
+      "sha256": "69e2264b3bea1d77320d06ddd8aa0b1016f90e17ba5e367ea1c5f82d940a76c2",
+      "missing": false
+    },
+    {
+      "path": "reports/evaluation_report.md",
+      "sha256": "f0db1aa8aa882f5e69e42e071927cd6f8fe4048ce825e2da0683deb4416f12f7",
+      "missing": false
+    },
+    {
+      "path": "reports/feature_importance_report.md",
+      "sha256": "808f5d3a17ca8b61e95ee8ed61662509c3ac9d4f95d935ad7d1cf30cc9d2d471",
+      "missing": false
+    },
+    {
+      "path": "reports/model_selection_report.md",
+      "sha256": "ab157cd2feee23e03fa47d769d8be63b335d31f219ac28da204c21d2e6868015",
+      "missing": false
+    },
+    {
+      "path": "reports/decision_validation_report.md",
+      "sha256": "4def0c3126bfe4e9f91e7a3a548d7ab9c99d0299c31e34ce608d961eec49286c",
+      "missing": false
+    },
+    {
+      "path": "reports/leakage_report.md",
+      "sha256": "0b8bc736e3e84e78e484f4a2668dbf25133144f8b78485a658124fcc87597b6e",
+      "missing": false
+    },
+    {
+      "path": "data/processed/feature_store.parquet",
+      "sha256": "78ffc7e6b9a1ebf2ad9ba90fc8a5917cffcb50a2282ed55c2e5f1d0bf75673e4",
+      "missing": false
+    }
+  ]
+}
